@@ -1,0 +1,93 @@
+#!/bin/bash
+
+read -p "Please enter user name: " user_name
+
+if [[ -n "$user_name" ]]
+then
+	grep -i -w ^$user_name /etc/passwd > /dev/null
+	
+	if [[ $? -eq 0 ]]
+	then
+		echo `grep -i ^$user_name /etc/passwd`
+		echo "User's shell is" `grep -i ^$user_name /etc/passwd | awk -F ':' '{print $7}'`
+		echo "User's home directory is" `grep -i ^$user_name /etc/passwd | awk -F ':' '{print $6}'`
+		echo "User is part of the following group(s):"`groups $user_name | awk -F ':' '{print $2}'`
+
+		while true 
+		do
+                	read -p "What would you like to change (u for uid,h for homedir,g for group, q for quit)? " answer
+
+			if [[ "$answer" == "u" ]]
+                	then
+                        	while true
+                        	do
+                                	read -p "Please enter the desired uid: " user_id
+
+                                	if [[ -n "$user_id" ]]
+                                	then
+                                        	var=`getent passwd $user_id`
+
+                                        	if [[ "$var" == "" ]]
+                                        	then
+                                                	sudo usermod -u $user_id $user_name
+							echo "User id has been changed!"
+                                                	break
+                                        	else
+                                                	echo "Please enter another uid, the one you entered is already in use"
+                                        	fi
+
+                                	fi
+                        	done
+	
+
+			elif [[ "$answer" == "h" ]]
+			then
+				read -p "What directory would you like to change to? " home_dir_path
+				read -p "Should the content of the current directory be moved (y/n)? " mv_home_dir_answer
+				if [[ -n "$home_dir_path" && "$mv_home_dir_answer" == "y" ]]
+				then
+					sudo usermod -m -d $home_dir_path $user_name
+					echo "Your home directory has been changed and the contents of the old one have been moved! :)"
+				elif [[ -n "$home_dir_path" && "$mv_home_dir_answer" == "n" ]]
+				then 
+					sudo usermod -d $home_dir_path $user_name
+					echo "Your home directory has been changed but you lost the contents of the old one! :("
+				fi
+		
+			elif [[ "$answer" == "g" ]]
+                	then
+				while true
+				do
+					read -p "Is it a primary or a secondary group (primary/secondary)?  " group_type
+					read -p "What is the new group name? " new_group_name
+					if [[ "$group_type" == "primary" && "$new_group_name" != "" ]]
+					then
+						sudo usermod -g $new_group_name $user_name
+						echo "Your primary group has been changed!"
+						break
+					elif [[ "$group_type" == "secondary" && "$new_group_name" != "" ]]
+					then
+						sudo usermod -aG $new_group_name $user_name
+						echo "You have been added to a new group!"
+						break
+					fi
+				done
+			elif [[ "$answer" == "q" ]]
+			then
+				break
+
+                	else
+                        	echo "Please enter a valid answer"
+                	fi
+
+		done
+
+	echo "And your final output is `grep -i ^$user_name /etc/passwd`"
+
+	else
+		echo "No such user exists"
+	fi	
+
+else
+	echo "Please enter a valid name"
+fi
