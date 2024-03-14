@@ -1,0 +1,30 @@
+#!/bin/bash
+
+function mount_device {
+        mount_dir=`/usr/bin/mktemp -d`
+        sudo mount $path $mount_dir
+        echo "The block device has been successfully mounted! Please check! Here's the output of cat /proc/mounts `cat /proc/mounts | grep $path`"
+}
+
+read -p "Please enter a path to the block device: " path
+
+if [[ -n "$path" ]]
+then
+	cat /proc/mounts | grep $path > /dev/null
+	if [[ $? -eq 0 ]]
+	then
+		echo "The block device is already mounted!"
+		exit 90
+	else
+		read -p "Is the file system created on $path (y/n)? " answer
+		if [[ "$answer" == "y" ]]
+		then
+			mount_device
+		elif [[ "$answer" == "n" ]]
+		then
+			read -p "Please specify the file system type (xfs/ext4) " fs_type
+			sudo mkfs.$fs_type $path
+			mount_device
+		fi
+	fi
+fi

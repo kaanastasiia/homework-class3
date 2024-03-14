@@ -1,0 +1,24 @@
+#!/bin/bash
+
+read -p "Please enter a file name: " file_name
+
+if [[ -n "$file_name" && ! -f $file_name ]]
+then
+	touch $file_name
+	
+	read -p "What ownership rights should the file have (777, 444)? " own_rights
+
+	if [[ $own_rights == 777 ]]
+	then
+		chmod $own_rights $file_name
+	elif [[ $own_rights == 444 ]]
+	then
+		chmod $own_rights $file_name
+	else 
+		echo "Please enter valid numbers"
+	fi
+
+else
+        echo "Such file exists, please enter another name"
+        exit 1
+fi
