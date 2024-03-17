@@ -1,0 +1,22 @@
+#!/bin/bash
+
+path=/dev/mapper/vgubuntu-root
+used_space=`df -h $path | awk 'FNR == 2 {print$5}' | sed "s/%//"`
+
+if [[ $used_space > 51 ]]
+then
+	logger "`date '+%d-%m-%Y %H:%M:%S'` MyDiskChecker: $path has less than 50% free disk space!"
+	echo "Please see the logs"
+elif [[ $used_space > 91 ]]
+then
+	logger "`date '+%d-%m-%Y %H:%M:%S'` MyDiskChecker: $path has less than 10% free disk space!" 
+	echo "Please see the logs"
+else
+	logger "`date '+%d-%m-%Y %H:%M:%S'` MyDiskChecker: $path has sufficient disk space!"
+	echo "Please see the logs"
+fi
+
+
+
+
+ 
