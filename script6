@@ -1,0 +1,16 @@
+#!/bin/bash
+
+read -p "Please enter the process id you need to check: " pid
+
+while true
+do
+	ps -elf | grep $pid | grep -v grep > /dev/null
+	if [[ $? -eq 0 ]]
+	then
+		process_name=`cat /proc/$pid/comm`
+		logger "`date '+%d-%m-%Y %H:%M:%S'` MySvcChecker: service $process_name is Up!"
+	else
+		logger "`date "+%d-%m-%Y %H:%M:%S"` MySvcChecker: service $process_name is Down!"
+	fi
+done
+
