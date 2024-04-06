@@ -1,0 +1,22 @@
+#!/bin/bash
+
+read -p "Please specify the path: " path
+read -p "Please specify the time (yy-mm-ddThh:mm:ss format): " time
+
+for i in $path
+do
+	var=`ls $i`
+	for j in $var
+	do		
+		if [[ -f $j ]]
+		then
+			#creation_date=`date -r $j +"%s"`
+			creation_date=`stat -c '%W' $j`
+			specified_date=`date -d $time +"%s"`
+				if [[ $creation_date > $specified_date ]]
+				then
+					echo $j
+				fi
+		fi
+	done
+done
