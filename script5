@@ -1,0 +1,20 @@
+#!/bin/bash
+
+input_file=$1
+
+echo "Enter 's user's name' to get the information about a particular user"
+echo "Enter 'c user's name' to add the user and its home directory to the list "
+echo "Enter 'd user's name' to change the deletion date to the current date"
+echo "Enter 'a' to to view all users in the list"
+read option user
+
+current_date=`date +%s`
+case $option in
+	s) grep -w "$user" $input_file ;;
+	c) 
+	   read -p "Please enter home directory " homedir  
+	   echo $user $current_date $homedir >> users_list ;;
+   	d) #sed -i 's,'"-"','"$current_date"',' $input_file ;;	
+	   sed -i "/\<$user\>/ s/\-/$current_date/" $input_file ;;
+	a) cat -n $input_file ;;
+esac
