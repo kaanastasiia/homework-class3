@@ -1,5 +1,6 @@
 #!/bin/bash
 
+#в качестве input_file использовался загруженный файл под названием users_list
 input_file=$1
 
 echo "Enter 's user's name' to get the information about a particular user"
